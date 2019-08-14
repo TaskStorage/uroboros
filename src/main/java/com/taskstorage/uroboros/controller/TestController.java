@@ -1,15 +1,17 @@
 package com.taskstorage.uroboros.controller;
 
-import static org.springframework.web.bind.annotation.RequestMethod.*;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 @RequestMapping("/")
-public class MainController {
+public class TestController {
 
-    @RequestMapping (method = GET)
-    public String main () {
+    @GetMapping
+    public String listCustomers(Model theModel) {
         return "main";
     }
+
 }

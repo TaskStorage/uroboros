@@ -12,6 +12,7 @@
   <properties>
     <failOnMissingWebXml>false</failOnMissingWebXml>
     <spring.version>5.1.9.RELEASE</spring.version>
+    <spring-security.version>5.1.6.RELEASE</spring-security.version>
     <servlets.version>4.0.1</servlets.version>
     <hibernate.version>5.4.4.Final</hibernate.version>
     <hibernate.validator>6.0.17.Final</hibernate.validator>
@@ -19,7 +20,7 @@
     <tld.version>1.1.2</tld.version>
     <jsp.version>2.3.3</jsp.version>
     <mysql.version>5.1.47</mysql.version>
-    <!--<mysql.version>8.0.17</mysql.version>-->
+    <freemarker.version>2.3.28</freemarker.version>
   </properties>
 
   <dependencies>
@@ -30,8 +31,18 @@
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
       <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-core</artifactId>
+      <version>${spring-security.version}</version>
     </dependency>
 
     <dependency>
@@ -72,6 +83,12 @@
       <groupId>mysql</groupId>
       <artifactId>mysql-connector-java</artifactId>
       <version>${mysql.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.freemarker</groupId>
+      <artifactId>freemarker</artifactId>
+      <version>${freemarker.version}</version>
     </dependency>
   </dependencies>
 
