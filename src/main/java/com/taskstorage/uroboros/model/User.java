@@ -2,6 +2,7 @@ package com.taskstorage.uroboros.model;
 
 import javax.persistence.*;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 public class User {
@@ -14,26 +15,25 @@ public class User {
 
     private String password;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    private boolean active;
+
+    @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER) //Формируем таблицу для ролей без создания Ентити + жадная инициализация
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id")) //Описываем имя таблицы с привязкой к таблице usr по полю user_id
+    @Enumerated(EnumType.STRING) //Харинм Енам в виде строки
+    private Set<Role> roles;
 
 //    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
 //    private List<Task> tasks;
 
+
     public User() {
     }
 
-    public User(String username, String password, Role role) {
+    public User(String username, String password, boolean active, Set<Role> roles) {
         this.username = username;
         this.password = password;
-        this.role = role;
-    }
-
-    public User(Long id, String username, String password, Role role) {
-        this.id = id;
-        this.username = username;
-        this.password = password;
-        this.role = role;
+        this.active = active;
+        this.roles = roles;
     }
 
     public Long getId() {
@@ -60,19 +60,19 @@ public class User {
         this.password = password;
     }
 
-    public Role getRole() {
-        return role;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setRole(Role role) {
-        this.role = role;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
-//    public List<Task> getTasks() {
-//        return tasks;
-//    }
-//
-//    public void setTasks(List<Task> tasks) {
-//        this.tasks = tasks;
-//    }
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
 }
