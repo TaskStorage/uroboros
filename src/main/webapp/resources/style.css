@@ -1,3 +1,5 @@
-body {
-    color: blue;
+.page-footer {
+    height: 30px; /* Set the fixed height of the footer here */
+    line-height: 2px; /* Vertically center the text there */
+    font-size: 12px;
 }
