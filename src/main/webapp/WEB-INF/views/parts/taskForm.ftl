@@ -24,7 +24,7 @@
         <input type="text" class="form-control" name="content" placeholder="Детали"  value="<#if currentTask??>${currentTask.content}</#if>"></input>
         </div>
 
-        <#--<input type="hidden" name="_csrf" value="${_csrf.token}"/>-->
+        <input type="hidden" name="_csrf" value="${_csrf.token}"/>
         <div>
             <button type="submit" class="btn btn-primary"><#if currentTask??>Сохранить<#else>Добавить</#if></button>
         </div>

@@ -20,7 +20,7 @@ import java.util.Set;
 public class RegisterController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @GetMapping("/register")
     public String register(Model model) {
@@ -29,11 +29,7 @@ public class RegisterController {
 
     @PostMapping("/register")
     public String createUser(Model model, User user) {
-
-        user.setActive(true);
-        user.setRoles(Collections.singleton(Role.USER));
-
-        userRepository.createUser(user);
+        userService.createUser(user);
         return "redirect:/";
     }
 

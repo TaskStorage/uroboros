@@ -12,6 +12,7 @@ public class Task {
     private String description;
     private String content;
 
+    //TODO + controller
 //    @ManyToOne(fetch = FetchType.EAGER)
 //    @JoinColumn(name = "user_id")
 //    private User author;

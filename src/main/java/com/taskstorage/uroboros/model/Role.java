@@ -1,5 +1,12 @@
 package com.taskstorage.uroboros.model;
 
-public enum Role {
-    USER, ADMIN, UNKNOWN
+import org.springframework.security.core.GrantedAuthority;
+
+public enum Role implements GrantedAuthority {
+    USER, ADMIN, UNKNOWN;
+
+    @Override
+    public String getAuthority() {
+        return name();
+    }
 }

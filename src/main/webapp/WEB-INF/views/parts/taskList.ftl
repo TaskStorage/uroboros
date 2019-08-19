@@ -16,6 +16,7 @@
             <td>
                 <form method="post" action="/deleteTask/${task.id}">
                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                    <input type="hidden" name="_csrf" value="${_csrf.token}"/>
                 </form>
             </td>
         </tr>

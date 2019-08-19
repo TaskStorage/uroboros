@@ -9,7 +9,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
     // Конфиг для Spring ContextLoaderListener
     @Override
     protected Class <?> [] getRootConfigClasses() {
-        return new Class<?>[] { DbConfig.class};
+        return new Class<?>[] { SecurityConfig.class, DbConfig.class, EncryptionConfig.class};
     }
     // Конфиг для Dispatcher Servlet
     @Override
@@ -22,10 +22,11 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
         return new String[] { "/" };
     }
 
-    @Override
-    protected Filter[] getServletFilters() {
-        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
-        characterEncodingFilter.setEncoding("UTF-8");
-        return new Filter[] { characterEncodingFilter};
-    }
+//    Doesn't work with spring security
+//    @Override
+//    protected Filter[] getServletFilters() {
+//        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
+//        characterEncodingFilter.setEncoding("UTF-8");
+//        return new Filter[] { characterEncodingFilter};
+//    }
 }

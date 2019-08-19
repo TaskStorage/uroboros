@@ -26,7 +26,8 @@ public class TaskController {
         model.addAttribute("tasks", tasks);
         return "tasks";
     }
-
+    //TODO "@AuthenticationPrincipal User user" - author
+    //TODO File attach
     @PostMapping("/createTask")
     public String create(Model model, Task task) {
         taskService.createTask(task);
@@ -57,14 +58,13 @@ public class TaskController {
             @RequestParam("content") String content) throws IOException {
 
         Task currentTask = taskService.selectById(id);
-
-                if(!StringUtils.isEmpty(description)) {
-                    currentTask.setDescription(description);
-                }
-                if(!StringUtils.isEmpty(content)) {
-                    currentTask.setContent(content);
-                }
-                taskService.updateTask(currentTask);
+            if(!StringUtils.isEmpty(description)) {
+                currentTask.setDescription(description);
+            }
+            if(!StringUtils.isEmpty(content)) {
+                currentTask.setContent(content);
+            }
+            taskService.updateTask(currentTask);
 
         return "redirect:/tasks/";
     }
