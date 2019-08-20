@@ -12,34 +12,23 @@ public class Task {
     private String description;
     private String content;
 
-    //TODO + controller
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "user_id")
-//    private User author;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User author;
 
     public Task() {
     }
 
-//    public Task(String description, String content, User author) {
-//        this.description = description;
-//        this.content = content;
-//        this.author = author;
-//    }
-//    public Task(Long id, String description, String content, User author) {
-//        this.id = id;
-//        this.description = description;
-//        this.content = content;
-//        this.author = author;
-//    }
-
     public Task(String description, String content, User author) {
         this.description = description;
         this.content = content;
+        this.author = author;
     }
     public Task(Long id, String description, String content, User author) {
         this.id = id;
         this.description = description;
         this.content = content;
+        this.author = author;
     }
 
     public Long getId() {
@@ -66,11 +55,11 @@ public class Task {
         this.content = content;
     }
 
-//    public User getAuthor() {
-//        return author;
-//    }
-//
-//    public void setAuthor(User author) {
-//        this.author = author;
-//    }
+    public User getAuthor() {
+        return author;
+    }
+
+    public void setAuthor(User author) {
+        this.author = author;
+    }
 }

@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void deleteUser(Long id) {
-        //TODO + view
+        //TODO + view (disable)
         userRepository.deleteUser(id);
     }
 

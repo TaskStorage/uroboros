@@ -1,8 +1,10 @@
 package com.taskstorage.uroboros.controller;
 
 import com.taskstorage.uroboros.model.Task;
-import com.taskstorage.uroboros.service.TaskService;
+import com.taskstorage.uroboros.model.User;
+import com.taskstorage.uroboros.repository.TaskRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -18,33 +20,42 @@ import java.util.List;
 public class TaskController {
 
     @Autowired
-    private TaskService taskService;
+    private TaskRepository taskRepository;
 
     @GetMapping("/tasks")
-    public String listTasks(Model model) {
-        List<Task> tasks = taskService.selectAll();
+    public String listTasks(@RequestParam(required = false, defaultValue = "") String searchTag, Model model) {
+
+        List<Task> tasks;
+
+        if (searchTag != null && !searchTag.isEmpty()) {
+            tasks = taskRepository.findByDescriptionContainingOrContentContaining(searchTag);
+        } else {
+            tasks = taskRepository.selectAll();
+        }
+
         model.addAttribute("tasks", tasks);
         return "tasks";
     }
-    //TODO "@AuthenticationPrincipal User user" - author
+
     //TODO File attach
     @PostMapping("/createTask")
-    public String create(Model model, Task task) {
-        taskService.createTask(task);
+    public String create(@AuthenticationPrincipal User user, Model model, Task task) {
+        task.setAuthor(user);
+        taskRepository.createTask(task);
         return "redirect:/tasks";
     }
 
     @PostMapping("/deleteTask/{id}")
     public String delete(@PathVariable Long id) {
-        taskService.deleteTask(id);
+        taskRepository.deleteTask(id);
         return "redirect:/tasks";
     }
 
     @GetMapping("/tasks/edit/{id}")
     public String getTask(Model model, @PathVariable Long id) {
 
-        List<Task> tasks = taskService.selectAll();
-        Task currentTask = taskService.selectById(id);
+        List<Task> tasks = taskRepository.selectAll();
+        Task currentTask = taskRepository.selectById(id);
 
         model.addAttribute("tasks", tasks);
         model.addAttribute("currentTask", currentTask);
@@ -57,14 +68,14 @@ public class TaskController {
             @RequestParam("description") String description,
             @RequestParam("content") String content) throws IOException {
 
-        Task currentTask = taskService.selectById(id);
+        Task currentTask = taskRepository.selectById(id);
             if(!StringUtils.isEmpty(description)) {
                 currentTask.setDescription(description);
             }
             if(!StringUtils.isEmpty(content)) {
                 currentTask.setContent(content);
             }
-            taskService.updateTask(currentTask);
+            taskRepository.updateTask(currentTask);
 
         return "redirect:/tasks/";
     }

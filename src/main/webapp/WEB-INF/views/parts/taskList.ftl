@@ -3,6 +3,7 @@
     <tr>
         <th scope="col">Description</th>
         <th scope="col">Content</th>
+        <th scope="col">Author</th>
         <th scope="col">Action</th>
         <th scope="col" class="col-1"></th>
     </tr>
@@ -12,6 +13,7 @@
         <tr>
             <td>${task.description}</td>
             <td>${task.content}</td>
+            <td>${task.author.username}</td>
             <td><a class="btn btn-primary btn-sm" href="/tasks/edit/${task.id}">Edit</a></td>
             <td>
                 <form method="post" action="/deleteTask/${task.id}">

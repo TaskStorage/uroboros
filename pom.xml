@@ -13,6 +13,7 @@
     <failOnMissingWebXml>false</failOnMissingWebXml>
     <spring.version>5.1.9.RELEASE</spring.version>
     <spring-security.version>5.1.6.RELEASE</spring-security.version>
+    <spring-data.version>2.1.10.RELEASE</spring-data.version>
     <servlets.version>4.0.1</servlets.version>
     <hibernate.version>5.4.4.Final</hibernate.version>
     <hibernate.validator>6.0.17.Final</hibernate.validator>
@@ -38,6 +39,11 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
       <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.data</groupId>
+      <artifactId>spring-data-jpa</artifactId>
+      <version>${spring-data.version}</version>
     </dependency>
 
     <dependency>

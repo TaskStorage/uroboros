@@ -22,12 +22,12 @@ public class User implements UserDetails {
     private boolean active;
 
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER) //Формируем таблицу для ролей без создания Ентити + жадная инициализация
-    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id")) //Описываем имя таблицы с привязкой к таблице usr по полю user_id
+    @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id")) //Создаём таблицу user_role которая джоинится с текущей таблицей User по полю user_id
     @Enumerated(EnumType.STRING) //Харинм Енам в виде строки
     private Set<Role> roles;
 
-//    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-//    private List<Task> tasks;
+    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Task> tasks;
 
 
     public User() {
@@ -78,6 +78,14 @@ public class User implements UserDetails {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
+    }
+
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 
     @Override

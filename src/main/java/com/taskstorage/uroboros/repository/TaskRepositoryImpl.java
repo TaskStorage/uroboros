@@ -76,4 +76,21 @@ public class TaskRepositoryImpl implements TaskRepository {
         session.getTransaction().commit();
         session.close();
     }
+
+    @Override
+    public List<Task> findByDescriptionContainingOrContentContaining(String searchTag) {
+        List<Task> tasks = null;
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        String queryString = "from Task where description like :searchTag or content like :searchTag";
+//        String queryString = "from Task where description = :searchTag or content = :searchTag";
+        Query query = session.createQuery(queryString);
+        query.setParameter("searchTag", "%"+searchTag+"%");
+//        query.setParameter("searchTag", searchTag);
+
+        tasks = query.getResultList();
+        session.close();
+        return tasks;
+    }
 }

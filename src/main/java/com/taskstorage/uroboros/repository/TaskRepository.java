@@ -10,4 +10,6 @@ public interface TaskRepository {
     void createTask(Task task);
     void updateTask(Task task);
     void deleteTask(Long id);
+
+    List<Task> findByDescriptionContainingOrContentContaining(String searchTag);
 }
