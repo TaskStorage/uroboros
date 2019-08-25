@@ -20,8 +20,13 @@ public class RegisterController {
     }
 
     @PostMapping("/register")
-    public String createUser(Model model, User user) {
-        userService.createUser(user);
+    public String createUser(User user, Model model) {
+
+        if (!userService.createUser(user)){
+            model.addAttribute("error", "User already exists");
+            return "register";
+        }
+
         return "redirect:/";
     }
 

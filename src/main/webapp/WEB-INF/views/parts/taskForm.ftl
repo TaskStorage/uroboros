@@ -18,15 +18,15 @@
     <div class="form-group mt-3">
     <form method="post" <#if currentTask??>action="/tasks/edit/${currentTask.id}"<#else>action="/createTask"</#if>>
         <div class="form-group">
-        <input type="text" class="form-control" name="description" placeholder="Описание" value="<#if currentTask??>${currentTask.description}</#if>"></input>
+        <input type="text" class="form-control" name="description" placeholder="Description" value="<#if currentTask??>${currentTask.description}</#if>"></input>
         </div>
         <div class="form-group">
-        <input type="text" class="form-control" name="content" placeholder="Детали"  value="<#if currentTask??>${currentTask.content}</#if>"></input>
+        <input type="text" class="form-control" name="content" placeholder="Content"  value="<#if currentTask??>${currentTask.content}</#if>"></input>
         </div>
 
         <input type="hidden" name="_csrf" value="${_csrf.token}"/>
         <div>
-            <button type="submit" class="btn btn-primary"><#if currentTask??>Сохранить<#else>Добавить</#if></button>
+            <button type="submit" class="btn btn-primary"><#if currentTask??>Сохранить<#else>Create</#if></button>
         </div>
     </form>
     </div>

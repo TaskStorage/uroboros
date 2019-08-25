@@ -37,18 +37,22 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void createUser(User user) {
+    public boolean createUser(User user) {
 
+        User userFromDB = selectByUsername(user.getUsername());
+        if (userFromDB != null) {
+            return false;
+        }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setActive(true);
         user.setRoles(Collections.singleton(Role.USER));
 
         userRepository.createUser(user);
+        return true;
     }
 
     @Override
     public void updateUser(User user) {
-        //TODO + view
         userRepository.updateUser(user);
     }
 

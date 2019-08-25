@@ -9,7 +9,7 @@ public interface UserService extends UserDetailsService {
     List<User> selectAll();
     User selectById(Long id);
     User selectByUsername(String username);
-    void createUser(User user);
+    boolean createUser(User user);
     void updateUser(User user);
     void deleteUser(Long id);
 }

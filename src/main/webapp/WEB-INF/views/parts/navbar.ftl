@@ -1,4 +1,6 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<#import "logout.ftl" as l>
+
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
     <a class="navbar-brand text-white" href="/">
         <img src="/resources/logo.png" width="50" height="30" class="d-inline-block align-left" alt=""/>
         TaskStorage
@@ -19,5 +21,6 @@
         </ul>
         <a href="/login" class="btn btn-primary btn-sm">Login</a>
         <a href="/register" class="btn btn-primary btn-sm ml-1">Register</a>
+        <@l.logout/>
     </div>
 </nav>

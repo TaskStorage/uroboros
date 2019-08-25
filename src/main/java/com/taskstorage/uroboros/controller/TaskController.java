@@ -34,6 +34,7 @@ public class TaskController {
         }
 
         model.addAttribute("tasks", tasks);
+		model.addAttribute("searchTag", searchTag);
         return "tasks";
     }
 

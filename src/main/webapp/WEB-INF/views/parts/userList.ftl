@@ -13,7 +13,7 @@
                 <td>${user.username}</td>
                 <td><#list user.roles as role>${role}<#sep>, </#list></td>
                 <td>${user.active?string}</td>
-                <td><a href="/user/${user.id}">edit</a></td>
+                <td><a href="/users/edit/${user.id}">edit</a></td>
             </tr>
         </#list>
         </tbody>

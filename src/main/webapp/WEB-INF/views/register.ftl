@@ -1,13 +1,9 @@
 <#import "parts/boilerplate.ftl" as c>
+<#import "parts/access.ftl" as a>
 <@c.page>
-
-<div>
-    <form action="/register" method="post">
-        <div><label> User Name : <input type="text" name="username"/> </label></div>
-        <div><label> Password: <input type="password" name="password"/> </label></div>
-        <input type="hidden" name="_csrf" value="${_csrf.token}"/>
-        <div><input type="submit" value="Sign In"/></div>
-    </form>
-</div>
+    <#if error??>
+        <div class="mb-3">${error}</div>
+    </#if>
+    <@a.access "/register" true/>
 
 </@c.page>
