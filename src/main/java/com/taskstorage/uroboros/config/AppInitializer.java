@@ -1,11 +1,21 @@
 package com.taskstorage.uroboros.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.web.filter.CharacterEncodingFilter;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
-import javax.servlet.Filter;
 
+import javax.servlet.FilterRegistration;
+import javax.servlet.MultipartConfigElement;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRegistration.Dynamic;
+
+@PropertySource("classpath:application.properties")
 public class AppInitializer extends AbstractAnnotationConfigDispatcherServletInitializer {
 
+    @Value("${upload.path}")
+    private String uploadPath;
     // Конфиг для Spring ContextLoaderListener
     @Override
     protected Class <?> [] getRootConfigClasses() {
@@ -22,11 +32,17 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
         return new String[] { "/" };
     }
 
-//    Doesn't work with spring security
-//    @Override
-//    protected Filter[] getServletFilters() {
-//        CharacterEncodingFilter characterEncodingFilter = new CharacterEncodingFilter();
-//        characterEncodingFilter.setEncoding("UTF-8");
-//        return new Filter[] { characterEncodingFilter};
-//    }
+    //Конфиг для MultipartResolver
+    @Override
+    protected void customizeRegistration(Dynamic registration) {
+        //Parameters:-
+        //   location - the directory location where files will be stored
+        //   maxFileSize - the maximum size allowed for uploaded files
+        //   maxRequestSize - the maximum size allowed for multipart/form-data requests
+        //   fileSizeThreshold - the size threshold after which files will be written to disk
+        MultipartConfigElement multipartConfig = new MultipartConfigElement(uploadPath, 10485760,
+                10485760, 0);
+        registration.setMultipartConfig(multipartConfig);
+    }
+
 }

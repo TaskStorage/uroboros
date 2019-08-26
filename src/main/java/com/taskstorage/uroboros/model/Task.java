@@ -16,6 +16,8 @@ public class Task {
     @JoinColumn(name = "user_id")
     private User author;
 
+    private String filename;
+
     public Task() {
     }
 
@@ -61,5 +63,13 @@ public class Task {
 
     public void setAuthor(User author) {
         this.author = author;
+    }
+
+    public String getFilename() {
+        return filename;
+    }
+
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }
