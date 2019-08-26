@@ -24,7 +24,7 @@ public class MvcConfig implements WebMvcConfigurer {
     @Value("${upload.path}")
     private String uploadPath;
 
-//  FreeMarker
+    //FreeMarker
     @Bean
     public FreeMarkerViewResolver resolver() {
         FreeMarkerViewResolver resolver = new FreeMarkerViewResolver();
