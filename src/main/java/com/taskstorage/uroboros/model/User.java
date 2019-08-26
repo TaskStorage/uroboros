@@ -29,6 +29,9 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Task> tasks;
 
+    public boolean isAdmin() {
+        return roles.contains(Role.ADMIN);
+    }
 
     public User() {
     }
