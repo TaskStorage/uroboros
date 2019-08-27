@@ -22,6 +22,7 @@
     <jsp.version>2.3.3</jsp.version>
     <mysql.version>5.1.47</mysql.version>
     <freemarker.version>2.3.28</freemarker.version>
+    <java-mail.version>1.6.2</java-mail.version>
   </properties>
 
   <dependencies>
@@ -45,7 +46,11 @@
       <artifactId>spring-data-jpa</artifactId>
       <version>${spring-data.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>com.sun.mail</groupId>
+      <artifactId>javax.mail</artifactId>
+      <version>${java-mail.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-core</artifactId>

@@ -59,6 +59,19 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    public User findByActivationCode(String code) {
+        User user = null;
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+        String queryString = "from User where activationCode = :code";
+        Query query = session.createQuery(queryString);
+        query.setParameter("code", code);
+        user = (User) query.uniqueResult();
+        session.close();
+        return user;
+    }
+
+    @Override
     public void createUser(User user) {
         session = sessionFactory.openSession();
         session.beginTransaction();

@@ -4,23 +4,34 @@ import com.taskstorage.uroboros.model.Role;
 import com.taskstorage.uroboros.model.User;
 import com.taskstorage.uroboros.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
+@PropertySource("classpath:application.properties")
 public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository userRepository;
 
     @Autowired
+    MailService mailService;
+
+    @Autowired
     PasswordEncoder passwordEncoder;
+
+    @Value("${hostname}")
+    private String hostname;
 
     public List<User> selectAll() {
         return userRepository.selectAll();
@@ -42,11 +53,25 @@ public class UserService implements UserDetailsService {
             return false;
         }
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        user.setActive(true);
+        user.setActive(false);
         user.setRoles(Collections.singleton(Role.USER));
-
+        user.setActivationCode(UUID.randomUUID().toString());
         userRepository.createUser(user);
+
+        sendMessage(user);
         return true;
+    }
+
+    private void sendMessage(User user) {
+        if (!StringUtils.isEmpty(user.getEmail())) {
+            String message = String.format("Hello, %s! \n" +
+                            "Welcome to Task Storage. Please, visit next link: http://%s/activate/%s",
+                    user.getUsername(),
+                    hostname,
+                    user.getActivationCode()
+            );
+            mailService.send(user.getEmail(),"Activation code", message);
+        }
     }
 
     public void updateUser(User user) {
@@ -64,5 +89,18 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("User not found");
         }
         return user;
+    }
+
+    public boolean activateUser(String code) {
+        User user = userRepository.findByActivationCode(code);
+
+        if (user == null) {
+            return false;
+        }
+        user.setActivationCode(null);
+        user.setActive(true);
+        userRepository.updateUser(user);
+
+        return true;
     }
 }

@@ -21,6 +21,10 @@ public class User implements UserDetails {
 
     private boolean active;
 
+    private String email;
+
+    private String activationCode;
+
     @ElementCollection(targetClass = Role.class, fetch = FetchType.EAGER) //Формируем таблицу для ролей без создания Ентити + жадная инициализация
     @CollectionTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id")) //Создаём таблицу user_role которая джоинится с текущей таблицей User по полю user_id
     @Enumerated(EnumType.STRING) //Харинм Енам в виде строки
@@ -89,6 +93,22 @@ public class User implements UserDetails {
 
     public void setTasks(List<Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getActivationCode() {
+        return activationCode;
+    }
+
+    public void setActivationCode(String activationCode) {
+        this.activationCode = activationCode;
     }
 
     @Override

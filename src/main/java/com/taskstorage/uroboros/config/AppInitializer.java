@@ -14,10 +14,9 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
     private String uploadPath;
 
     // Конфиг для Spring ContextLoaderListener
-    //TODO Проверить нужен ли MailConfig здесь
     @Override
     protected Class <?> [] getRootConfigClasses() {
-        return new Class<?>[] { SecurityConfig.class, DbConfig.class, EncryptionConfig.class};
+        return new Class<?>[] { SecurityConfig.class, DbConfig.class, EncryptionConfig.class, MailConfig.class};
     }
 
     // Конфиг для Dispatcher Servlet
