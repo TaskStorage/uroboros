@@ -41,9 +41,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .permitAll()
             .and()
                 .logout()
-                .permitAll()
-            .and()
-                .rememberMe();
+                .permitAll();
+            //TODO https://www.boraji.com/spring-security-5-remember-me-authentication-example
+            //.and()
+            //.rememberMe();
     }
 
     @Override

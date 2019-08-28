@@ -14,6 +14,7 @@
     <spring.version>5.1.9.RELEASE</spring.version>
     <spring-security.version>5.1.6.RELEASE</spring-security.version>
     <spring-data.version>2.1.10.RELEASE</spring-data.version>
+    <spring-session.version>2.1.8.RELEASE</spring-session.version>
     <servlets.version>4.0.1</servlets.version>
     <hibernate.version>5.4.4.Final</hibernate.version>
     <hibernate.validator>6.0.17.Final</hibernate.validator>
@@ -66,7 +67,11 @@
       <artifactId>spring-security-web</artifactId>
       <version>${spring-security.version}</version>
     </dependency>
-
+    <dependency>
+      <groupId>org.springframework.session</groupId>
+      <artifactId>spring-session-jdbc</artifactId>
+      <version>${spring-session.version}</version>
+    </dependency>
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-core</artifactId>
