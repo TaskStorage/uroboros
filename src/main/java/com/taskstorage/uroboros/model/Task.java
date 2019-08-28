@@ -1,6 +1,9 @@
 package com.taskstorage.uroboros.model;
 
+import org.hibernate.validator.constraints.Length;
+
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 public class Task {
@@ -9,7 +12,12 @@ public class Task {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
+    @NotBlank(message = "Please fill the description")
+    @Length(max = 2048, message = "Description too long")
     private String description;
+
+    @NotBlank(message = "Describe the problem")
+    @Length(max = 2048, message = "Too long")
     private String content;
 
     @ManyToOne(fetch = FetchType.EAGER)
@@ -19,18 +27,6 @@ public class Task {
     private String filename;
 
     public Task() {
-    }
-
-    public Task(String description, String content, User author) {
-        this.description = description;
-        this.content = content;
-        this.author = author;
-    }
-    public Task(Long id, String description, String content, User author) {
-        this.id = id;
-        this.description = description;
-        this.content = content;
-        this.author = author;
     }
 
     public Long getId() {

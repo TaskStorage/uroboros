@@ -31,16 +31,19 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(filter, CsrfFilter.class);
 
         http
-                .authorizeRequests()
+            .authorizeRequests()
                 .antMatchers("/","/register","/resources/**","/activate/*").permitAll()
                 .anyRequest().authenticated()
-                .and()
+            .and()
                 .formLogin()
                 .loginPage("/login")
+                .defaultSuccessUrl("/", true)
                 .permitAll()
-                .and()
+            .and()
                 .logout()
-                .permitAll();
+                .permitAll()
+            .and()
+                .rememberMe();
     }
 
     @Override

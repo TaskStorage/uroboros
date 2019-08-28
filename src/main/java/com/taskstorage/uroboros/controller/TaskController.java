@@ -10,6 +10,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,6 +21,7 @@ import javax.validation.Valid;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Controller
@@ -49,11 +51,32 @@ public class TaskController {
     }
 
     @PostMapping("/createTask")
-    public String create(@AuthenticationPrincipal User user, Model model, Task task, @RequestParam("file") MultipartFile file) throws IOException {
+    public String create(@AuthenticationPrincipal User user,
+                         @Valid Task task,
+                         BindingResult bindingResult,
+                         Model model,
+                         @RequestParam("file") MultipartFile file) throws IOException {
         task.setAuthor(user);
-        saveFile(task, file);
-        taskRepository.createTask(task);
-        return "redirect:/tasks";
+
+        if (bindingResult.hasErrors()) {
+            //Смотри ControllerUtils
+            Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
+            //Добавляем ошибки в модель
+            model.mergeAttributes(errorsMap);
+            //Заполняем поля в форме добавления чтоб не вводить заново
+            model.addAttribute("task", task);
+            // Вытягиваем все объекты из репозитория и кладём в модель
+            List<Task> tasks = taskRepository.selectAll();
+            model.addAttribute("tasks", tasks);
+            //Возвращаем модель
+            return "tasks";
+
+        } else {
+            //Если ошибок валидации нет - редиректим чтоб сообщение не дублировалось при перезагрузке
+            saveFile(task, file);
+            taskRepository.createTask(task);
+            return "redirect:/tasks";
+        }
     }
 
     private void saveFile(@Valid Task task, @RequestParam("file") MultipartFile file) throws IOException {
@@ -94,7 +117,7 @@ public class TaskController {
         Task currentTask = taskRepository.selectById(id);
 
         model.addAttribute("tasks", tasks);
-        model.addAttribute("currentTask", currentTask);
+        model.addAttribute("task", currentTask);
         return "tasks";
     }
 

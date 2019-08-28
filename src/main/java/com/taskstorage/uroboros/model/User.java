@@ -1,9 +1,12 @@
 package com.taskstorage.uroboros.model;
 
+import org.hibernate.validator.constraints.Length;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -15,12 +18,18 @@ public class User implements UserDetails {
     @GeneratedValue
     private Long id;
 
+    @NotBlank(message = "Username cannot be empty")
+    @Length(max = 255, message = "Username too long")
     private String username;
 
+    @NotBlank(message = "Password cannot be empty")
+    @Length(max = 255, message = "Password too long")
     private String password;
 
     private boolean active;
 
+    @Email(message = "Email is not correct")
+    @NotBlank(message = "Email cannot be empty")
     private String email;
 
     private String activationCode;
@@ -38,13 +47,6 @@ public class User implements UserDetails {
     }
 
     public User() {
-    }
-
-    public User(String username, String password, boolean active, Set<Role> roles) {
-        this.username = username;
-        this.password = password;
-        this.active = active;
-        this.roles = roles;
     }
 
     public Long getId() {

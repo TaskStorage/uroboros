@@ -23,6 +23,11 @@
                     <a class="nav-link" href="/users">Users</span></a>
                 </li>
             </#if>
+            <#if user??>
+                <li class="nav-item">
+                    <a class="nav-link" href="/profile">Profile</span></a>
+                </li>
+            </#if>
         </ul>
         <#if !user??>
             <a href="/login" class="btn btn-primary btn-sm">Login</a>
