@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface TaskRepository {
     List<Task> selectAll();
+    List<Task> selectByUser(User user);
     Task selectById(Long id);
     void createTask(Task task);
     void updateTask(Task task);

@@ -10,7 +10,6 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,22 +36,29 @@ public class TaskController {
     @Value("${upload.path}")
     private String uploadPath;
 
+    //Получаем только свои
     @GetMapping("/tasks")
-    public String listTasks(@RequestParam(required = false, defaultValue = "") String searchTag, Model model) {
+    public String personalTasks(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false, defaultValue = "") String searchTag,
+            Model model,
+            @RequestParam(required = false) Task task
 
-        List<Task> tasks;
+    ) {
+        Iterable<Task> tasks;
 
         if (searchTag != null && !searchTag.isEmpty()) {
-            tasks = taskRepository.findByDescriptionContainingOrContentContaining(searchTag);
+            tasks = taskRepository.findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(searchTag, user);
         } else {
-            tasks = taskRepository.selectAll();
+            tasks = taskRepository.selectByUser(user);
         }
 
         model.addAttribute("tasks", tasks);
-		model.addAttribute("searchTag", searchTag);
+        model.addAttribute("task", task);
         return "tasks";
     }
 
+    //Создаём новые
     @PostMapping("/createTask")
     public String create(@AuthenticationPrincipal User user,
                          @Valid Task task,
@@ -95,11 +101,17 @@ public class TaskController {
             task.setFilename(resultFilename);
         }
     }
-
+    //Удаляем только свои или любые если админ
     @PostMapping("/deleteTask/{id}")
-    public String delete(@PathVariable Long id) {
-        fileDelete(id);
-        taskRepository.deleteTask(id);
+    public String delete(@AuthenticationPrincipal User user, @PathVariable Long id) {
+        List<Task> tasks = taskRepository.selectByUser(user);
+        Task currentTask = taskRepository.selectById(id);
+
+        if (tasks.contains(currentTask) || user.isAdmin()) {
+            fileDelete(id);
+            taskRepository.deleteTask(id);
+        }
+
         return "redirect:/tasks";
     }
 
@@ -113,94 +125,49 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/tasks/edit/{id}")
-    public String getTask(Model model, @PathVariable Long id) {
 
-        List<Task> tasks = taskRepository.selectAll();
-        Task currentTask = taskRepository.selectById(id);
 
-        model.addAttribute("tasks", tasks);
-        model.addAttribute("task", currentTask);
-        return "tasks";
-    }
+    /////////////////////////////////////////
+//    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/manage")
+    public String allTasks(@RequestParam(required = false, defaultValue = "") String searchTag, Model model) {
 
-    @PostMapping("/tasks/edit/{id}")
-    public String updateTask(
-            @PathVariable Long id,
-            @RequestParam("description") String description,
-            @RequestParam("content") String content,
-            @RequestParam("file") MultipartFile file) throws IOException {
-
-        Task currentTask = taskRepository.selectById(id);
-            if(!StringUtils.isEmpty(description)) {
-                currentTask.setDescription(description);
-            }
-            if(!StringUtils.isEmpty(content)) {
-                currentTask.setContent(content);
-            }
-            fileDelete(currentTask.getId());
-            currentTask.setFilename(null);
-            if (!file.getOriginalFilename().isEmpty())
-            {
-            saveFile(currentTask, file);
-            }
-
-            taskRepository.updateTask(currentTask);
-
-        return "redirect:/tasks/";
-    }
-    //TODO Personal tasks
-    @GetMapping("/personal-tasks/{userId}")
-    public String personalTasks(
-            @AuthenticationPrincipal User currentUser,
-            @PathVariable Long userId,
-            @RequestParam(required = false, defaultValue = "") String searchTag,
-            Model model,
-            @RequestParam(required = false) Task task
-
-    ) {
         Iterable<Task> tasks;
-        User user = userRepository.selectById(userId);
 
         if (searchTag != null && !searchTag.isEmpty()) {
-            tasks = taskRepository.findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(searchTag, user);
+            tasks = taskRepository.findByDescriptionContainingOrContentContaining(searchTag);
         } else {
-            tasks = user.getTasks();
+            tasks = taskRepository.selectAll();
         }
 
         model.addAttribute("tasks", tasks);
-        model.addAttribute("task", task);
-        model.addAttribute("isCurrentUser", currentUser.equals(user));
-        return "userTasks";
+		model.addAttribute("searchTag", searchTag);
+        return "tasks";
     }
-    @PostMapping("/personal-tasks/{user}")
-    public String updateTask(@AuthenticationPrincipal User currentUser,
-                             @PathVariable Long user,
-                             @RequestParam("id") Task task,
-                             @RequestParam("description") String description,
-                             @RequestParam("content") String content,
-                             @RequestParam("file") MultipartFile file
-
-    ) throws IOException {
-        if (task != null){
-            if (task.getAuthor().equals(currentUser)) {
-                if(!StringUtils.isEmpty(description)) {
-                    task.setDescription(description);
-                }if(!StringUtils.isEmpty(content)) {
-                    task.setContent(content);
-                }
-                fileDelete(task.getId());
-                task.setFilename(null);
-                if (!file.getOriginalFilename().isEmpty())
-                {
-                    saveFile(task, file);
-                }
-
-                taskRepository.updateTask(task);
-            }
-        }
-        return "redirect:/personal-tasks/" + user;
-    }
+//
+//    @PreAuthorize("hasAuthority('ADMIN')")
+//    @GetMapping("/manage/{userId}")
+//    public String personalTasks(
+//            @PathVariable Long userId,
+//            @RequestParam(required = false, defaultValue = "") String searchTag,
+//            Model model,
+//            @RequestParam(required = false) Task task
+//
+//    ) {
+//        Iterable<Task> tasks;
+//        User user = userRepository.selectById(userId);
+//
+//        if (searchTag != null && !searchTag.isEmpty()) {
+//            tasks = taskRepository.findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(searchTag, user);
+//        } else {
+//            tasks = user.getTasks();
+//        }
+//
+//        model.addAttribute("tasks", tasks);
+//        model.addAttribute("task", task);
+//
+//        return "userTasks";
+//    }
 }
 
 

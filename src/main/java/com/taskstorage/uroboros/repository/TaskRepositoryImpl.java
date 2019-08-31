@@ -29,6 +29,21 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
+    public List<Task> selectByUser(User user) {
+        List<Task> tasks = null;
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        String queryString = "from Task where user_id = :id";
+        Query query = session.createQuery(queryString);
+        query.setParameter("id", user.getId());
+
+        tasks = query.getResultList();
+        session.close();
+        return tasks;
+    }
+
+    @Override
     public Task selectById(Long id) {
         Task task = null;
         session = sessionFactory.openSession();

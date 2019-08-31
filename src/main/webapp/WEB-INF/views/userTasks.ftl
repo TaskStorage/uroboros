@@ -1,9 +1,7 @@
 <#import "parts/boilerplate.ftl" as c>
 <@c.page>
 
-    <#if isCurrentUser>
-        <#include "parts/taskForm.ftl" />
-    </#if>
+    <#include "parts/taskForm.ftl" />
     <#include "parts/taskList.ftl">
 
 </@c.page>

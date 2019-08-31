@@ -15,14 +15,15 @@
         <ul class="navbar-nav mr-auto">
             <#if user??>
                 <li class="nav-item">
-                    <a class="nav-link" href="/tasks">Tasks</span></a>
+                    <a class="nav-link" href="/tasks">My Tasks</span></a>
                 </li>
             </#if>
-            <#if user??>
+            <#if isAdmin>
                 <li class="nav-item">
-                    <a class="nav-link" href="/personal-tasks/${currentUserId}">Personal</a>
+                    <a class="nav-link" href="/manage">All Tasks</a>
                 </li>
             </#if>
+
             <#if isAdmin>
                 <li class="nav-item">
                     <a class="nav-link" href="/users">Users</span></a>

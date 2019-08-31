@@ -38,10 +38,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING) //Харинм Енам в виде строки
     private Set<Role> roles;
 
-//    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    private Set<Task> tasks;
-
     public boolean isAdmin() {
         return roles.contains(Role.ADMIN);
     }
@@ -87,14 +83,6 @@ public class User implements UserDetails {
 
     public void setRoles(Set<Role> roles) {
         this.roles = roles;
-    }
-
-    public Set<Task> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(Set<Task> tasks) {
-        this.tasks = tasks;
     }
 
     public String getEmail() {
