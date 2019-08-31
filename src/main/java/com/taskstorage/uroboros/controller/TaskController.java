@@ -3,6 +3,7 @@ package com.taskstorage.uroboros.controller;
 import com.taskstorage.uroboros.model.Task;
 import com.taskstorage.uroboros.model.User;
 import com.taskstorage.uroboros.repository.TaskRepository;
+import com.taskstorage.uroboros.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -30,6 +31,8 @@ public class TaskController {
 
     @Autowired
     private TaskRepository taskRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -147,6 +150,57 @@ public class TaskController {
         return "redirect:/tasks/";
     }
     //TODO Personal tasks
+    @GetMapping("/personal-tasks/{userId}")
+    public String personalTasks(
+            @AuthenticationPrincipal User currentUser,
+            @PathVariable Long userId,
+            @RequestParam(required = false, defaultValue = "") String searchTag,
+            Model model,
+            @RequestParam(required = false) Task task
+
+    ) {
+        Iterable<Task> tasks;
+        User user = userRepository.selectById(userId);
+
+        if (searchTag != null && !searchTag.isEmpty()) {
+            tasks = taskRepository.findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(searchTag, user);
+        } else {
+            tasks = user.getTasks();
+        }
+
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("task", task);
+        model.addAttribute("isCurrentUser", currentUser.equals(user));
+        return "userTasks";
+    }
+    @PostMapping("/personal-tasks/{user}")
+    public String updateTask(@AuthenticationPrincipal User currentUser,
+                             @PathVariable Long user,
+                             @RequestParam("id") Task task,
+                             @RequestParam("description") String description,
+                             @RequestParam("content") String content,
+                             @RequestParam("file") MultipartFile file
+
+    ) throws IOException {
+        if (task != null){
+            if (task.getAuthor().equals(currentUser)) {
+                if(!StringUtils.isEmpty(description)) {
+                    task.setDescription(description);
+                }if(!StringUtils.isEmpty(content)) {
+                    task.setContent(content);
+                }
+                fileDelete(task.getId());
+                task.setFilename(null);
+                if (!file.getOriginalFilename().isEmpty())
+                {
+                    saveFile(task, file);
+                }
+
+                taskRepository.updateTask(task);
+            }
+        }
+        return "redirect:/personal-tasks/" + user;
+    }
 }
 
 

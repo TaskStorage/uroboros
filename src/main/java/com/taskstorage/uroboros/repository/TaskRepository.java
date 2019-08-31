@@ -1,6 +1,7 @@
 package com.taskstorage.uroboros.repository;
 
 import com.taskstorage.uroboros.model.Task;
+import com.taskstorage.uroboros.model.User;
 
 import java.util.List;
 
@@ -12,4 +13,6 @@ public interface TaskRepository {
     void deleteTask(Long id);
 
     List<Task> findByDescriptionContainingOrContentContaining(String searchTag);
+
+    List<Task> findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(String searchTag, User user);
 }

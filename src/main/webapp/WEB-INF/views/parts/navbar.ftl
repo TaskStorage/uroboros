@@ -18,6 +18,11 @@
                     <a class="nav-link" href="/tasks">Tasks</span></a>
                 </li>
             </#if>
+            <#if user??>
+                <li class="nav-item">
+                    <a class="nav-link" href="/personal-tasks/${currentUserId}">Personal</a>
+                </li>
+            </#if>
             <#if isAdmin>
                 <li class="nav-item">
                     <a class="nav-link" href="/users">Users</span></a>
