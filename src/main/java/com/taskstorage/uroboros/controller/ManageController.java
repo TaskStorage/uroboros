@@ -123,89 +123,88 @@ public class ManageController {
                 file.delete();}
         }
     }
-//
-//    @GetMapping("/tasks/edit/{id}")
-//    public String getTask(@AuthenticationPrincipal User user, Model model, @PathVariable Long id) {
-//
-//        List<Task> tasks = taskRepository.selectByUser(user);
-//        Task currentTask = taskRepository.selectById(id);
-//        model.addAttribute("tasks", tasks);
-//
-//        if (tasks.contains(currentTask) || user.isAdmin()) {
-//            model.addAttribute("task", currentTask);
-//            return "tasks";
-//        }
-//        return "tasks";
-//    }
-//
-//    @PostMapping("/tasks/edit/{id}")
-//    public String updateTask(
-//            @AuthenticationPrincipal User user,
-//            @PathVariable Long id,
-//            @RequestParam("description") String description,
-//            @RequestParam("content") String content,
-//            @RequestParam("file") MultipartFile file) throws IOException {
-//
-//        List<Task> tasks = taskRepository.selectByUser(user);
-//        Task currentTask = taskRepository.selectById(id);
-//
-//        if (tasks.contains(currentTask) || user.isAdmin()) {
-//            if(!StringUtils.isEmpty(description)) {
-//                currentTask.setDescription(description);
-//            }
-//            if(!StringUtils.isEmpty(content)) {
-//                currentTask.setContent(content);
-//            }
-//            fileDelete(currentTask.getId());
-//            currentTask.setFilename(null);
-//            if (!file.getOriginalFilename().isEmpty()) {
-//                saveFile(currentTask, file);
-//            }
-//            taskRepository.updateTask(currentTask);
-//        }
-//        return "redirect:/tasks/";
-//    }
-//
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @GetMapping("/manage")
-//    public String allTasks(@RequestParam(required = false, defaultValue = "") String searchTag, Model model) {
-//
-//        Iterable<Task> tasks;
-//
-//        if (searchTag != null && !searchTag.isEmpty()) {
-//            tasks = taskRepository.findByDescriptionContainingOrContentContaining(searchTag);
-//        } else {
-//            tasks = taskRepository.selectAll();
-//        }
-//
-//        model.addAttribute("tasks", tasks);
-//        model.addAttribute("searchTag", searchTag);
-//        return "tasks";
-//    }
-//
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @GetMapping("/manage/{userId}")
-//    public String personalTasks(
-//            @PathVariable Long userId,
-//            @RequestParam(required = false, defaultValue = "") String searchTag,
-//            Model model,
-//            @RequestParam(required = false) Task task
-//
-//    ) {
-//        Iterable<Task> tasks;
-//        User user = userRepository.selectById(userId);
-//
-//        if (searchTag != null && !searchTag.isEmpty()) {
-//            tasks = taskRepository.findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(searchTag, user);
-//        } else {
-//            tasks = user.getTasks();
-//        }
-//
-//        model.addAttribute("tasks", tasks);
-//        model.addAttribute("task", task);
-//
-//        return "userTasks";
-//    }
+
+
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/manage/user/{username}")
+    public String personalTasks(
+            @PathVariable String username,
+            @RequestParam(required = false, defaultValue = "") String searchTag,
+            Model model,
+            @RequestParam(required = false) Task task
+
+    ) {
+        List<User> users = userService.selectAll();
+        User selectedUser = userService.selectByUsername(username);
+
+        Iterable<Task> tasks;
+
+        if (searchTag != null && !searchTag.isEmpty()) {
+            tasks = taskRepository.findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(searchTag, selectedUser);
+        } else {
+            tasks = taskRepository.selectByUser(selectedUser);
+        }
+        model.addAttribute("users", users);
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("searchTag", searchTag);
+
+        return "manageTasks";
+    }
+
+    @GetMapping("/manage/edit/{id}")
+    public String getTask(Model model, @PathVariable Long id) {
+
+        Task currentTask = taskRepository.selectById(id);
+        User selectedUser = currentTask.getAuthor();
+        List<Task> tasks = taskRepository.selectByUser(selectedUser);
+        List<User> users = userService.selectAll();
+
+        model.addAttribute("users", users);
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("task", currentTask);
+        return "manageTasks";
+    }
+
+    @PostMapping("/manage/edit/{id}")
+    public String updateTask(
+            @RequestParam("username") String username,
+            @Valid Task task,
+            BindingResult bindingResult,
+            Model model,
+            @RequestParam("file") MultipartFile file) throws IOException {
+
+        User selectedUser = userService.selectByUsername(username);
+        List<Task> tasks = taskRepository.selectByUser(selectedUser);
+
+        if (bindingResult.hasErrors()) {
+            //Смотри ControllerUtils
+            Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
+            //Добавляем ошибки в модель
+            model.mergeAttributes(errorsMap);
+            //Заполняем поля в форме добавления чтоб не вводить заново
+            model.addAttribute("task", task);
+            model.addAttribute("tasks", tasks);
+
+            List<User> users = userService.selectAll();
+            model.addAttribute("users", users);
+            //Возвращаем модель
+            return "manageTasks";
+
+        }
+
+        fileDelete(task.getId());
+
+        if (!file.getOriginalFilename().isEmpty()) {
+
+            task.setFilename(null);
+            saveFile(task, file);
+        }
+        task.setAuthor(selectedUser);
+
+        taskRepository.updateTask(task);
+
+        return "redirect:/manage";
+    }
 }
 
 

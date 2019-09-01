@@ -147,26 +147,26 @@ public class TaskController {
             @RequestParam("file") MultipartFile file) throws IOException {
 
         List<Task> tasks = taskRepository.selectByUser(user);
-        Task currentTask = taskRepository.selectById(task.getId());
 
-
-        if (bindingResult.hasErrors() && tasks.contains(currentTask)) {
+        if (bindingResult.hasErrors() || !tasks.contains(task)) {
             //Смотри ControllerUtils
             Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
             //Добавляем ошибки в модель
             model.mergeAttributes(errorsMap);
             //Заполняем поля в форме добавления чтоб не вводить заново
-            model.addAttribute("task", task);
-
+            if (tasks.contains(task)) {
+                model.addAttribute("task", task);
+            }
             model.addAttribute("tasks", tasks);
             //Возвращаем модель
             return "tasks";
         }
+        fileDelete(task.getId());
 
         if (!file.getOriginalFilename().isEmpty()) {
-            fileDelete(currentTask.getId());
-            currentTask.setFilename(null);
-            saveFile(currentTask, file);
+
+            task.setFilename(null);
+            saveFile(task, file);
         }
         task.setAuthor(user);
 
