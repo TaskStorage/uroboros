@@ -1,6 +1,7 @@
 package com.taskstorage.uroboros.repository;
 
 import com.taskstorage.uroboros.model.Task;
+import com.taskstorage.uroboros.model.User;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
@@ -23,6 +24,21 @@ public class TaskRepositoryImpl implements TaskRepository {
         session = sessionFactory.openSession();
         session.beginTransaction();
         tasks = session.createQuery("from Task").list();
+        session.close();
+        return tasks;
+    }
+
+    @Override
+    public List<Task> selectByUser(User user) {
+        List<Task> tasks = null;
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        String queryString = "from Task where user_id = :id";
+        Query query = session.createQuery(queryString);
+        query.setParameter("id", user.getId());
+
+        tasks = query.getResultList();
         session.close();
         return tasks;
     }
@@ -84,10 +100,24 @@ public class TaskRepositoryImpl implements TaskRepository {
         session.beginTransaction();
 
         String queryString = "from Task where description like :searchTag or content like :searchTag";
-//        String queryString = "from Task where description = :searchTag or content = :searchTag";
         Query query = session.createQuery(queryString);
         query.setParameter("searchTag", "%"+searchTag+"%");
-//        query.setParameter("searchTag", searchTag);
+
+        tasks = query.getResultList();
+        session.close();
+        return tasks;
+    }
+
+    @Override
+    public List<Task> findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(String searchTag, User user) {
+        List<Task> tasks = null;
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+
+        String queryString = "from Task where description like :searchTag and user_id = :user or content like :searchTag and user_id = :user";
+        Query query = session.createQuery(queryString);
+        query.setParameter("searchTag", "%"+searchTag+"%");
+        query.setParameter("user", user.getId());
 
         tasks = query.getResultList();
         session.close();

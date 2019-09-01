@@ -31,16 +31,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.addFilterBefore(filter, CsrfFilter.class);
 
         http
-                .authorizeRequests()
-                .antMatchers("/","/register","/resources/**").permitAll()
+            .authorizeRequests()
+                .antMatchers("/","/register","/resources/**","/activate/*").permitAll()
                 .anyRequest().authenticated()
-                .and()
+            .and()
                 .formLogin()
                 .loginPage("/login")
+                .defaultSuccessUrl("/tasks", true)
                 .permitAll()
-                .and()
+            .and()
                 .logout()
                 .permitAll();
+            //TODO https://www.boraji.com/spring-security-5-remember-me-authentication-example
+            //.and()
+            //.rememberMe();
     }
 
     @Override

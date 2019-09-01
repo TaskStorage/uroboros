@@ -8,6 +8,7 @@ public interface UserRepository {
     List<User> selectAll();
     User selectById(Long id);
     User selectByUsername(String username);
+    User findByActivationCode(String code);
     void createUser(User user);
     void updateUser(User user);
     void deleteUser(Long id);

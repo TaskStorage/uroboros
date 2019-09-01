@@ -3,10 +3,11 @@ package com.taskstorage.uroboros.controller;
 import com.taskstorage.uroboros.model.Task;
 import com.taskstorage.uroboros.model.User;
 import com.taskstorage.uroboros.repository.TaskRepository;
+import com.taskstorage.uroboros.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -24,43 +25,48 @@ import java.util.Map;
 import java.util.UUID;
 
 @Controller
+@PreAuthorize("hasAuthority('ADMIN')")
 @PropertySource("classpath:application.properties")
-public class TaskController {
+public class ManageController {
 
     @Autowired
     private TaskRepository taskRepository;
 
+    @Autowired
+    private UserService userService;
+
     @Value("${upload.path}")
     private String uploadPath;
 
-    //Получаем только свои
-    @GetMapping("/tasks")
-    public String personalTasks(
-            @AuthenticationPrincipal User user,
-            @RequestParam(required = false, defaultValue = "") String searchTag,
-            Model model) {
+    //Получаем все
+    @GetMapping("/manage")
+    public String allTasks(@RequestParam(required = false, defaultValue = "") String searchTag, Model model) {
 
         Iterable<Task> tasks;
 
-        if (searchTag != null && !searchTag.isEmpty()) {
-            tasks = taskRepository.findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(searchTag, user);
-        } else {
-            tasks = taskRepository.selectByUser(user);
-        }
+        List<User> users = userService.selectAll();
 
+        if (searchTag != null && !searchTag.isEmpty()) {
+            tasks = taskRepository.findByDescriptionContainingOrContentContaining(searchTag);
+        } else {
+            tasks = taskRepository.selectAll();
+        }
+        model.addAttribute("users", users);
         model.addAttribute("tasks", tasks);
         model.addAttribute("searchTag", searchTag);
 
-        return "tasks";
+        return "manageTasks";
     }
 
     //Создаём новые
-    @PostMapping("/tasks/create")
-    public String create(@AuthenticationPrincipal User user,
+    @PostMapping("/manage/create")
+    public String create(@RequestParam("username") String username,
                          @Valid Task task,
                          BindingResult bindingResult,
                          Model model,
                          @RequestParam("file") MultipartFile file) throws IOException {
+
+        User user = userService.selectByUsername(username);
 
         task.setAuthor(user);
 
@@ -72,16 +78,16 @@ public class TaskController {
             //Заполняем поля в форме добавления чтоб не вводить заново
             model.addAttribute("task", task);
             // Вытягиваем все объекты из репозитория и кладём в модель
-            List<Task> tasks = taskRepository.selectByUser(user);
+            List<Task> tasks = tasks = taskRepository.selectAll();
             model.addAttribute("tasks", tasks);
             //Возвращаем модель
-            return "tasks";
+            return "manageTasks";
 
         } else {
             //Если ошибок валидации нет - редиректим чтоб сообщение не дублировалось при перезагрузке
             saveFile(task, file);
             taskRepository.createTask(task);
-            return "redirect:/tasks";
+            return "redirect:/manage";
         }
     }
 
@@ -99,68 +105,93 @@ public class TaskController {
         }
     }
 
-    //Удаляем только свои или любые если админ
-    @PostMapping("/tasks/delete/{id}")
-    public String delete(@AuthenticationPrincipal User user, @PathVariable Long id) {
-        List<Task> tasks = taskRepository.selectByUser(user);
-        Task currentTask = taskRepository.selectById(id);
+    @PostMapping("/manage/delete/{id}")
+    public String delete(@PathVariable Long id) {
 
-        if (tasks.contains(currentTask)) {
             fileDelete(id);
             taskRepository.deleteTask(id);
-        }
 
-        return "redirect:/tasks";
+        return "redirect:/manage";
     }
 
     private void fileDelete(Long id) {
         Task parentTask = taskRepository.selectById(id);
-        if (parentTask != null) {
+        if (parentTask !=null){
             String fileToDelete = parentTask.getFilename();
-            if (fileToDelete != null) {
+            if (fileToDelete != null){
                 File file = new File(uploadPath + "/" + fileToDelete);
-                file.delete();
-            }
+                file.delete();}
         }
     }
 
-    @GetMapping("/tasks/edit/{id}")
-    public String getTask(@AuthenticationPrincipal User user, Model model, @PathVariable Long id) {
 
-        List<Task> tasks = taskRepository.selectByUser(user);
-        Task currentTask = taskRepository.selectById(id);
+    @PreAuthorize("hasAuthority('ADMIN')")
+    @GetMapping("/manage/user/{username}")
+    public String personalTasks(
+            @PathVariable String username,
+            @RequestParam(required = false, defaultValue = "") String searchTag,
+            Model model,
+            @RequestParam(required = false) Task task
+
+    ) {
+        List<User> users = userService.selectAll();
+        User selectedUser = userService.selectByUsername(username);
+
+        Iterable<Task> tasks;
+
+        if (searchTag != null && !searchTag.isEmpty()) {
+            tasks = taskRepository.findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(searchTag, selectedUser);
+        } else {
+            tasks = taskRepository.selectByUser(selectedUser);
+        }
+        model.addAttribute("users", users);
         model.addAttribute("tasks", tasks);
+        model.addAttribute("searchTag", searchTag);
 
-        if (tasks.contains(currentTask)) {
-            model.addAttribute("task", currentTask);
-            return "tasks";
-        }
-        return "tasks";
+        return "manageTasks";
     }
 
-    @PostMapping("/tasks/edit/{id}")
+    @GetMapping("/manage/edit/{id}")
+    public String getTask(Model model, @PathVariable Long id) {
+
+        Task currentTask = taskRepository.selectById(id);
+        User selectedUser = currentTask.getAuthor();
+        List<Task> tasks = taskRepository.selectByUser(selectedUser);
+        List<User> users = userService.selectAll();
+
+        model.addAttribute("users", users);
+        model.addAttribute("tasks", tasks);
+        model.addAttribute("task", currentTask);
+        return "manageTasks";
+    }
+
+    @PostMapping("/manage/edit/{id}")
     public String updateTask(
-            @AuthenticationPrincipal User user,
+            @RequestParam("username") String username,
             @Valid Task task,
             BindingResult bindingResult,
             Model model,
             @RequestParam("file") MultipartFile file) throws IOException {
 
-        List<Task> tasks = taskRepository.selectByUser(user);
+        User selectedUser = userService.selectByUsername(username);
+        List<Task> tasks = taskRepository.selectByUser(selectedUser);
 
-        if (bindingResult.hasErrors() || !tasks.contains(task)) {
+        if (bindingResult.hasErrors()) {
             //Смотри ControllerUtils
             Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
             //Добавляем ошибки в модель
             model.mergeAttributes(errorsMap);
             //Заполняем поля в форме добавления чтоб не вводить заново
-            if (tasks.contains(task)) {
-                model.addAttribute("task", task);
-            }
+            model.addAttribute("task", task);
             model.addAttribute("tasks", tasks);
+
+            List<User> users = userService.selectAll();
+            model.addAttribute("users", users);
             //Возвращаем модель
-            return "tasks";
+            return "manageTasks";
+
         }
+
         fileDelete(task.getId());
 
         if (!file.getOriginalFilename().isEmpty()) {
@@ -168,11 +199,11 @@ public class TaskController {
             task.setFilename(null);
             saveFile(task, file);
         }
-        task.setAuthor(user);
+        task.setAuthor(selectedUser);
 
         taskRepository.updateTask(task);
 
-        return "redirect:/tasks/";
+        return "redirect:/manage";
     }
 }
 

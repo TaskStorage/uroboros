@@ -14,16 +14,27 @@
 </form>
 <#--/Шапка-->
 <#--Тело-->
-<div class="collapse <#if currentTask??>show</#if>" id="collapseExample">
+<div class="collapse <#if task??>show</#if>" id="collapseExample">
     <div class="form-group mt-3">
-        <form method="post" <#if currentTask??>action="/tasks/edit/${currentTask.id}"<#else>action="/createTask"</#if> enctype="multipart/form-data">
+        <form method="post" <#if task?? && task.id !=0>action="/tasks/edit/${task.id}"<#else>action="/tasks/create"</#if> enctype="multipart/form-data">
             <div class="form-group">
-                <input type="text" class="form-control" name="description" placeholder="Description" value="<#if currentTask??>${currentTask.description}</#if>"></input>
+                <input class="form-control ${(descriptionError??)?string('is-invalid', '')}" type="text" name="description"
+                       value="<#if task??>${task.description}</#if>" placeholder="Enter description">
+                <#if descriptionError??>
+                    <div class="invalid-feedback">
+                        ${descriptionError}
+                    </div>
+                </#if>
             </div>
             <div class="form-group">
-                <input type="text" class="form-control" name="content" placeholder="Content"  value="<#if currentTask??>${currentTask.content}</#if>"></input>
+                <input class="form-control ${(contentError??)?string('is-invalid', '')}" name="content" value="<#if task??>${task.content}</#if>"
+                       placeholder="Details">
+                <#if contentError??>
+                    <div class="invalid-feedback">
+                        ${contentError}
+                    </div>
+                </#if>
             </div>
-
             <div class="custom-file mb-2">
                 <input type="file" name="file" class="custom-file-input" id="customFile">
                 <label class="custom-file-label" for="customFile">Choose file</label>
@@ -44,10 +55,10 @@
                     );
                 </script>
             </div>
-
             <input type="hidden" name="_csrf" value="${_csrf.token}"/>
+            <input type="hidden" name="id" value="<#if task??>${task.id}<#else>0</#if>"/>
             <div>
-                <button type="submit" class="btn btn-primary"><#if currentTask??>Сохранить<#else>Create</#if></button>
+                <button type="submit" class="btn btn-primary"><#if task??>Save<#else>Create</#if></button>
             </div>
         </form>
     </div>

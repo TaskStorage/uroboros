@@ -5,6 +5,8 @@ import com.taskstorage.uroboros.model.User;
 import com.taskstorage.uroboros.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,19 +48,21 @@ public class UserController {
     @PostMapping("/users/edit/{id}")
     public String userSave(
             @RequestParam String username,
+            @RequestParam String email,
             @RequestParam(required = false) String active,
             @RequestParam Map<String, String> form,
             @PathVariable Long id) {
 
         User user = userService.selectById(id);
-        if (username !=null) {
+        if (username != null) {
             user.setUsername(username);
         }
-
-        if (active !=null && active.equals("on")) {
-            user.setActive(true);
+        if (email != null) {
+            user.setEmail(email);
         }
-        else {
+        if (active != null && active.equals("on")) {
+            user.setActive(true);
+        } else {
             user.setActive(false);
         }
         //Список допустимых ролей
@@ -79,6 +83,22 @@ public class UserController {
         return "redirect:/users";
     }
 
-    //TODO профиль пользователя
+    @GetMapping("/profile")
+    public String getProfile(Model model, @AuthenticationPrincipal User user) {
+        model.addAttribute("username", user.getUsername());
+        model.addAttribute("email", user.getEmail());
 
+        return "profile";
+    }
+
+    @PostMapping("/profile")
+    public String updateProfile(Model model,
+                                @AuthenticationPrincipal User user,
+                                @RequestParam String password,
+                                @RequestParam String email) {
+        userService.updateProfile(user, password, email);
+        SecurityContextHolder.clearContext();
+        model.addAttribute("message", "Вы успешно изменили данные, залогиньтесь снова");
+        return "login";
+    }
 }

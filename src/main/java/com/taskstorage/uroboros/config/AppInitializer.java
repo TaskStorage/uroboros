@@ -16,7 +16,7 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
     // Конфиг для Spring ContextLoaderListener
     @Override
     protected Class <?> [] getRootConfigClasses() {
-        return new Class<?>[] { SecurityConfig.class, DbConfig.class, EncryptionConfig.class};
+        return new Class<?>[] { SecurityConfig.class, DbConfig.class, EncryptionConfig.class, MailConfig.class};
     }
 
     // Конфиг для Dispatcher Servlet
