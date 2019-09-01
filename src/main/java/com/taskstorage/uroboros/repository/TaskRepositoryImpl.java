@@ -100,10 +100,8 @@ public class TaskRepositoryImpl implements TaskRepository {
         session.beginTransaction();
 
         String queryString = "from Task where description like :searchTag or content like :searchTag";
-//        String queryString = "from Task where description = :searchTag or content = :searchTag";
         Query query = session.createQuery(queryString);
         query.setParameter("searchTag", "%"+searchTag+"%");
-//        query.setParameter("searchTag", searchTag);
 
         tasks = query.getResultList();
         session.close();
@@ -116,7 +114,7 @@ public class TaskRepositoryImpl implements TaskRepository {
         session = sessionFactory.openSession();
         session.beginTransaction();
 
-        String queryString = "from Task where description like :searchTag or content like :searchTag and user_id = :user";
+        String queryString = "from Task where description like :searchTag and user_id = :user or content like :searchTag and user_id = :user";
         Query query = session.createQuery(queryString);
         query.setParameter("searchTag", "%"+searchTag+"%");
         query.setParameter("user", user.getId());

@@ -48,6 +48,7 @@ public class UserController {
     @PostMapping("/users/edit/{id}")
     public String userSave(
             @RequestParam String username,
+            @RequestParam String email,
             @RequestParam(required = false) String active,
             @RequestParam Map<String, String> form,
             @PathVariable Long id) {
@@ -56,7 +57,9 @@ public class UserController {
         if (username != null) {
             user.setUsername(username);
         }
-
+        if (email != null) {
+            user.setEmail(email);
+        }
         if (active != null && active.equals("on")) {
             user.setActive(true);
         } else {

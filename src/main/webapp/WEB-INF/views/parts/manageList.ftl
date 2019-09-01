@@ -14,11 +14,11 @@
         <tr>
             <td>${task.description}</td>
             <td>${task.content}</td>
-            <td class="text-center">${task.author.username}</td>
+            <td class="text-center"><a href="/manage/user/${task.author.username}">${(task.author.username)!"&lt;Anonymous&gt;"}</a></td>
             <td class="text-center"><#if task.filename??><a download href="/attachment/${task.filename}">Download</a><#else>N/A</#if></td>
-            <td><a class="btn btn-primary btn-sm" href="/tasks/edit/${task.id}">Edit</a></td>
+            <td><a class="btn btn-primary btn-sm" href="/manage/edit/${task.id}">Edit</a></td>
             <td>
-                <form method="post" action="/tasks/delete/${task.id}">
+                <form method="post" action="/manage/delete/${task.id}">
                     <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                     <input type="hidden" name="_csrf" value="${_csrf.token}"/>
                 </form>

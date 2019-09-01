@@ -16,7 +16,7 @@
 <#--Тело-->
 <div class="collapse <#if task??>show</#if>" id="collapseExample">
     <div class="form-group mt-3">
-        <form method="post" <#if task?? && task.id !=0>action="/tasks/edit/${task.id}"<#else>action="/createTask"</#if> enctype="multipart/form-data">
+        <form method="post" <#if task?? && task.id !=0>action="/tasks/edit/${task.id}"<#else>action="/tasks/create"</#if> enctype="multipart/form-data">
             <div class="form-group">
                 <input class="form-control ${(descriptionError??)?string('is-invalid', '')}" type="text" name="description"
                        value="<#if task??>${task.description}</#if>" placeholder="Enter description">
@@ -28,7 +28,7 @@
             </div>
             <div class="form-group">
                 <input class="form-control ${(contentError??)?string('is-invalid', '')}" name="content" value="<#if task??>${task.content}</#if>"
-                       placeholder="Details"></input>
+                       placeholder="Details">
                 <#if contentError??>
                     <div class="invalid-feedback">
                         ${contentError}

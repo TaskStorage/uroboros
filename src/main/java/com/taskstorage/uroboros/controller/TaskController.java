@@ -3,7 +3,6 @@ package com.taskstorage.uroboros.controller;
 import com.taskstorage.uroboros.model.Task;
 import com.taskstorage.uroboros.model.User;
 import com.taskstorage.uroboros.repository.TaskRepository;
-import com.taskstorage.uroboros.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -30,8 +29,6 @@ public class TaskController {
 
     @Autowired
     private TaskRepository taskRepository;
-    @Autowired
-    private UserRepository userRepository;
 
     @Value("${upload.path}")
     private String uploadPath;
@@ -41,10 +38,8 @@ public class TaskController {
     public String personalTasks(
             @AuthenticationPrincipal User user,
             @RequestParam(required = false, defaultValue = "") String searchTag,
-            Model model,
-            @RequestParam(required = false) Task task
+            Model model) {
 
-    ) {
         Iterable<Task> tasks;
 
         if (searchTag != null && !searchTag.isEmpty()) {
@@ -54,17 +49,19 @@ public class TaskController {
         }
 
         model.addAttribute("tasks", tasks);
-        model.addAttribute("task", task);
+        model.addAttribute("searchTag", searchTag);
+
         return "tasks";
     }
 
     //Создаём новые
-    @PostMapping("/createTask")
+    @PostMapping("/tasks/create")
     public String create(@AuthenticationPrincipal User user,
                          @Valid Task task,
                          BindingResult bindingResult,
                          Model model,
                          @RequestParam("file") MultipartFile file) throws IOException {
+
         task.setAuthor(user);
 
         if (bindingResult.hasErrors()) {
@@ -75,7 +72,7 @@ public class TaskController {
             //Заполняем поля в форме добавления чтоб не вводить заново
             model.addAttribute("task", task);
             // Вытягиваем все объекты из репозитория и кладём в модель
-            List<Task> tasks = taskRepository.selectAll();
+            List<Task> tasks = taskRepository.selectByUser(user);
             model.addAttribute("tasks", tasks);
             //Возвращаем модель
             return "tasks";
@@ -101,13 +98,14 @@ public class TaskController {
             task.setFilename(resultFilename);
         }
     }
+
     //Удаляем только свои или любые если админ
-    @PostMapping("/deleteTask/{id}")
+    @PostMapping("/tasks/delete/{id}")
     public String delete(@AuthenticationPrincipal User user, @PathVariable Long id) {
         List<Task> tasks = taskRepository.selectByUser(user);
         Task currentTask = taskRepository.selectById(id);
 
-        if (tasks.contains(currentTask) || user.isAdmin()) {
+        if (tasks.contains(currentTask)) {
             fileDelete(id);
             taskRepository.deleteTask(id);
         }
@@ -117,57 +115,65 @@ public class TaskController {
 
     private void fileDelete(Long id) {
         Task parentTask = taskRepository.selectById(id);
-        if (parentTask !=null){
+        if (parentTask != null) {
             String fileToDelete = parentTask.getFilename();
-            if (fileToDelete != null){
+            if (fileToDelete != null) {
                 File file = new File(uploadPath + "/" + fileToDelete);
-                file.delete();}
+                file.delete();
+            }
         }
     }
 
+    @GetMapping("/tasks/edit/{id}")
+    public String getTask(@AuthenticationPrincipal User user, Model model, @PathVariable Long id) {
 
-
-    /////////////////////////////////////////
-//    @PreAuthorize("hasAuthority('ADMIN')")
-    @GetMapping("/manage")
-    public String allTasks(@RequestParam(required = false, defaultValue = "") String searchTag, Model model) {
-
-        Iterable<Task> tasks;
-
-        if (searchTag != null && !searchTag.isEmpty()) {
-            tasks = taskRepository.findByDescriptionContainingOrContentContaining(searchTag);
-        } else {
-            tasks = taskRepository.selectAll();
-        }
-
+        List<Task> tasks = taskRepository.selectByUser(user);
+        Task currentTask = taskRepository.selectById(id);
         model.addAttribute("tasks", tasks);
-		model.addAttribute("searchTag", searchTag);
+
+        if (tasks.contains(currentTask)) {
+            model.addAttribute("task", currentTask);
+            return "tasks";
+        }
         return "tasks";
     }
-//
-//    @PreAuthorize("hasAuthority('ADMIN')")
-//    @GetMapping("/manage/{userId}")
-//    public String personalTasks(
-//            @PathVariable Long userId,
-//            @RequestParam(required = false, defaultValue = "") String searchTag,
-//            Model model,
-//            @RequestParam(required = false) Task task
-//
-//    ) {
-//        Iterable<Task> tasks;
-//        User user = userRepository.selectById(userId);
-//
-//        if (searchTag != null && !searchTag.isEmpty()) {
-//            tasks = taskRepository.findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(searchTag, user);
-//        } else {
-//            tasks = user.getTasks();
-//        }
-//
-//        model.addAttribute("tasks", tasks);
-//        model.addAttribute("task", task);
-//
-//        return "userTasks";
-//    }
+
+    @PostMapping("/tasks/edit/{id}")
+    public String updateTask(
+            @AuthenticationPrincipal User user,
+            @Valid Task task,
+            BindingResult bindingResult,
+            Model model,
+            @RequestParam("file") MultipartFile file) throws IOException {
+
+        List<Task> tasks = taskRepository.selectByUser(user);
+        Task currentTask = taskRepository.selectById(task.getId());
+
+
+        if (bindingResult.hasErrors() && tasks.contains(currentTask)) {
+            //Смотри ControllerUtils
+            Map<String, String> errorsMap = ControllerUtils.getErrors(bindingResult);
+            //Добавляем ошибки в модель
+            model.mergeAttributes(errorsMap);
+            //Заполняем поля в форме добавления чтоб не вводить заново
+            model.addAttribute("task", task);
+
+            model.addAttribute("tasks", tasks);
+            //Возвращаем модель
+            return "tasks";
+        }
+
+        if (!file.getOriginalFilename().isEmpty()) {
+            fileDelete(currentTask.getId());
+            currentTask.setFilename(null);
+            saveFile(currentTask, file);
+        }
+        task.setAuthor(user);
+
+        taskRepository.updateTask(task);
+
+        return "redirect:/tasks/";
+    }
 }
 
 
