@@ -9,6 +9,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,15 +52,30 @@ public class UserController {
             @RequestParam String email,
             @RequestParam(required = false) String active,
             @RequestParam Map<String, String> form,
-            @PathVariable Long id) {
+            @PathVariable Long id, Model model) {
 
         User user = userService.selectById(id);
-        if (username != null) {
-            user.setUsername(username);
+
+        boolean isUsernameEmpty = StringUtils.isEmpty(username);
+
+        if (isUsernameEmpty) {
+            model.addAttribute("usernameError", "Username cannot be empty");
         }
-        if (email != null) {
-            user.setEmail(email);
+        boolean isEmailEmpty = StringUtils.isEmpty(email);
+
+        if (isEmailEmpty) {
+            model.addAttribute("emailError", "Email cannot be empty");
         }
+
+        if (isUsernameEmpty || isEmailEmpty) {
+            model.addAttribute("user", user);
+            model.addAttribute("roles", Role.values());
+            return "userEditPage";
+        }
+
+        user.setUsername(username);
+        user.setEmail(email);
+
         if (active != null && active.equals("on")) {
             user.setActive(true);
         } else {

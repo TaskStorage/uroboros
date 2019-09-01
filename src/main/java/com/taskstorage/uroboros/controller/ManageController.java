@@ -78,6 +78,8 @@ public class ManageController {
             //Заполняем поля в форме добавления чтоб не вводить заново
             model.addAttribute("task", task);
             // Вытягиваем все объекты из репозитория и кладём в модель
+            List<User> users = userService.selectAll();
+            model.addAttribute("users", users);
             List<Task> tasks = tasks = taskRepository.selectAll();
             model.addAttribute("tasks", tasks);
             //Возвращаем модель

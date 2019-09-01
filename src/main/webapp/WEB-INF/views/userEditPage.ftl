@@ -5,15 +5,25 @@
         <form method="post" action="/users/edit/${user.id}">
 
             <div class="form-group row">
-                <label class="col-sm-2 col-form-label">User Name:</label>
+                <label class="col-sm-2 col-form-label">Username:</label>
                 <div class="col-sm-5">
-                    <input type="text" name="username" value="${user.username}" class="form-control"/>
+                    <input type="text" name="username" value="${user.username}" class="form-control ${(usernameError??)?string('is-invalid', '')}"/>
+                    <#if usernameError??>
+                        <div class="invalid-feedback">
+                            ${usernameError}
+                        </div>
+                    </#if>
                 </div>
             </div>
             <div class="form-group row">
                 <label class="col-sm-2 col-form-label">Email:</label>
                 <div class="col-sm-5">
-                    <input type="text" name="email" value="${(user.email)!"&lt;unknown&gt;"}" class="form-control"/>
+                    <input type="text" name="email" value="${(user.email)!"&lt;unknown&gt;"}" class="form-control ${(emailError??)?string('is-invalid', '')}"/>
+                    <#if emailError??>
+                        <div class="invalid-feedback">
+                            ${emailError}
+                        </div>
+                    </#if>
                 </div>
             </div>
             <div>
