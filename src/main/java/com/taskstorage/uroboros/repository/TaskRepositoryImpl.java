@@ -6,6 +6,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -19,6 +21,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     private Session session;
 
     @Override
+    @Cacheable(value = "tasks")
     public List<Task> selectAll() {
         List<Task> tasks = null;
         session = sessionFactory.openSession();
@@ -29,6 +32,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
+    @Cacheable(value = "tasks")
     public List<Task> selectByUser(User user) {
         List<Task> tasks = null;
         session = sessionFactory.openSession();
@@ -44,6 +48,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
+    @Cacheable(value = "tasks",key = "#id")
     public Task selectById(Long id) {
         Task task = null;
         session = sessionFactory.openSession();
@@ -63,6 +68,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
+    @CacheEvict(value = "tasks", allEntries = true)
     public void createTask(Task task) {
         session = sessionFactory.openSession();
         session.beginTransaction();
@@ -72,6 +78,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
+    @CacheEvict(value = "tasks", allEntries = true)
     public void updateTask(Task task) {
         session = sessionFactory.openSession();
         session.beginTransaction();
@@ -81,6 +88,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     }
 
     @Override
+    @CacheEvict(value = "tasks", allEntries = true)
     public void deleteTask(Long id) {
         session = sessionFactory.openSession();
         session.beginTransaction();
