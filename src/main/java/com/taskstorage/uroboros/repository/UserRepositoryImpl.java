@@ -5,6 +5,8 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -18,6 +20,7 @@ public class UserRepositoryImpl implements UserRepository {
     private Session session;
 
     @Override
+    @Cacheable(value = "users")
     public List<User> selectAll() {
         List<User> users = null;
         session = sessionFactory.openSession();
@@ -28,6 +31,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    @Cacheable(value = "users")
     public User selectById(Long id) {
         User user = null;
         session = sessionFactory.openSession();
@@ -46,6 +50,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    @Cacheable(value = "users")
     public User selectByUsername(String username) {
         User user = null;
         session = sessionFactory.openSession();
@@ -72,6 +77,11 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    @CacheEvict(value = "users", allEntries = true)
+    //Alternate to @CacheEvict
+    //CacheManager manager = CacheManager.getInstance();
+    //Ehcache cache = manager.getCache("users");
+    //cache.removeAll();
     public void createUser(User user) {
         session = sessionFactory.openSession();
         session.beginTransaction();
@@ -81,6 +91,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    @CacheEvict(value = "users", allEntries = true)
     public void updateUser(User user) {
         session = sessionFactory.openSession();
         session.beginTransaction();
@@ -90,6 +101,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     @Override
+    @CacheEvict(value = "users", allEntries = true)
     public void deleteUser(Long id) {
         session = sessionFactory.openSession();
         session.beginTransaction();

@@ -48,6 +48,10 @@ public class DbConfig {
                 properties.put("hibernate.show_sql", environment.getRequiredProperty("hibernate.show_sql"));
                 properties.put("hibernate.format_sql", environment.getRequiredProperty("hibernate.format_sql"));
                 properties.put("hibernate.hbm2ddl.auto", environment.getRequiredProperty("hibernate.hbm2ddl.auto"));
+                //Caching properties
+                properties.put("hibernate.cache.region.factory_class", "org.hibernate.cache.ehcache.EhCacheRegionFactory");
+                properties.put("hibernate.cache.use_second_level_cache","true");
+                properties.put("net.sf.ehcache.configurationResourceName", "ehcache.xml");
                 return properties;
         }
 
