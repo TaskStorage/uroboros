@@ -58,9 +58,21 @@
                 <#if !isRegisterForm><a href="/register">Register</a>
                 <#else><div><a href="/login">Back to login</a></div></#if>
             </label>
-            <div class="col-sm-5">
+
+            <div class="col-sm-2 mt-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="remember-me" id="defaultCheck">
+                    <label class="form-check-label" for="defaultCheck">
+                        Remember
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-sm-2">
                 <button class="btn btn-primary" type="submit"><#if isRegisterForm>Create<#else>Sign In</#if></button>
             </div>
+
         </div>
+
     </form>
 </#macro>

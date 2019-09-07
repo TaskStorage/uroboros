@@ -31,6 +31,12 @@ create table user_role (
   roles varchar(255)
 ) engine=InnoDB;
 
+create table persistent_logins(
+  username varchar(255) not null,
+  series varchar(64) primary key,
+  token varchar(64) not null,
+  last_used timestamp not null
+);
 
 alter table Task add constraint task_user_fk
 foreign key (user_id) references User (id);
