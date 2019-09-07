@@ -10,7 +10,7 @@ import org.springframework.core.io.ClassPathResource;
 @Configuration
 @EnableCaching
 public class CachingConfig {
-        @Bean
+    @Bean
     public EhCacheManagerFactoryBean ehCacheManagerFactory() {
         EhCacheManagerFactoryBean cacheManagerFactoryBean = new EhCacheManagerFactoryBean();
         cacheManagerFactoryBean.setConfigLocation(new ClassPathResource("ehcache.xml"));
