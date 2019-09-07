@@ -15,4 +15,6 @@
 target
 out
 
+application.properties
+database.properties
 mail.properties
