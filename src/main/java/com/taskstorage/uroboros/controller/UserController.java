@@ -65,6 +65,7 @@ public class UserController {
 
         if (isEmailEmpty) {
             model.addAttribute("emailError", "Email cannot be empty");
+            //TODO Fix with wrong email
         }
 
         if (isUsernameEmpty || isEmailEmpty) {

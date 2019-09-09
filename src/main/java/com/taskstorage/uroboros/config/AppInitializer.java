@@ -2,6 +2,9 @@ package com.taskstorage.uroboros.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.servlet.DispatcherServlet;
+import org.springframework.web.servlet.FrameworkServlet;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 import javax.servlet.MultipartConfigElement;
@@ -42,5 +45,11 @@ public class AppInitializer extends AbstractAnnotationConfigDispatcherServletIni
                 10485760, 0);
         registration.setMultipartConfig(multipartConfig);
     }
-
+    //Для кастомной страницы 404 setThrowExceptionIfNoHandlerFound
+    @Override
+    protected FrameworkServlet createDispatcherServlet(WebApplicationContext servletAppContext) {
+        DispatcherServlet dispatcher = (DispatcherServlet) super.createDispatcherServlet(servletAppContext);
+        dispatcher.setThrowExceptionIfNoHandlerFound(true);
+        return dispatcher;
+    }
 }
