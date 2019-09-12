@@ -48,6 +48,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .defaultSuccessUrl("/tasks", true)
                 .permitAll()
             .and()
+                .exceptionHandling().accessDeniedPage("/403")
+            .and()
                 //https://www.boraji.com/spring-security-5-remember-me-authentication-example
                 .rememberMe().rememberMeParameter("remember-me").tokenRepository(tokenRepository())
             .and()

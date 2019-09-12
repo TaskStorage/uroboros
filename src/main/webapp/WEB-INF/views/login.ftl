@@ -16,10 +16,6 @@
             ${message}
         </div>
     </#if>
-<#--Сообщение при принудительном окончании сессии-->
-    <#if message??>
-        <div class="mb-3">${message}</div>
-    </#if>
 
     <@a.access "/login" false/>
 

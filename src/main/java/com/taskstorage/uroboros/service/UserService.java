@@ -79,7 +79,6 @@ public class UserService implements UserDetailsService {
     }
 
     public void deleteUser(Long id) {
-        //TODO + view (disable)
         userRepository.deleteUser(id);
     }
 

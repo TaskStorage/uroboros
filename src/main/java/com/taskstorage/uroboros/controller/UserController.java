@@ -3,6 +3,7 @@ package com.taskstorage.uroboros.controller;
 import com.taskstorage.uroboros.model.Role;
 import com.taskstorage.uroboros.model.User;
 import com.taskstorage.uroboros.service.UserService;
+import org.hibernate.validator.internal.constraintvalidators.bv.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -61,14 +62,18 @@ public class UserController {
         if (isUsernameEmpty) {
             model.addAttribute("usernameError", "Username cannot be empty");
         }
+
         boolean isEmailEmpty = StringUtils.isEmpty(email);
+        boolean isEmailCorrect = new EmailValidator().isValid(email, null);
 
         if (isEmailEmpty) {
             model.addAttribute("emailError", "Email cannot be empty");
-            //TODO Fix with wrong email
+        }
+        if (!isEmailCorrect) {
+            model.addAttribute("emailError", "Email is not correct");
         }
 
-        if (isUsernameEmpty || isEmailEmpty) {
+        if (isUsernameEmpty || isEmailEmpty || !isEmailCorrect) {
             model.addAttribute("user", user);
             model.addAttribute("roles", Role.values());
             return "userEditPage";
@@ -102,9 +107,7 @@ public class UserController {
 
     @GetMapping("/profile")
     public String getProfile(Model model, @AuthenticationPrincipal User user) {
-        model.addAttribute("username", user.getUsername());
-        model.addAttribute("email", user.getEmail());
-
+        model.addAttribute("user", user);
         return "profile";
     }
 
@@ -113,9 +116,32 @@ public class UserController {
                                 @AuthenticationPrincipal User user,
                                 @RequestParam String password,
                                 @RequestParam String email) {
+
+        boolean isPasswordEmpty = StringUtils.isEmpty(password);
+
+        if (isPasswordEmpty) {
+            model.addAttribute("passwordError", "password cannot be empty");
+        }
+
+        boolean isEmailEmpty = StringUtils.isEmpty(email);
+        boolean isEmailCorrect = new EmailValidator().isValid(email, null);
+
+        if (isEmailEmpty) {
+            model.addAttribute("emailError", "Email cannot be empty");
+        }
+        if (!isEmailCorrect) {
+            model.addAttribute("emailError", "Email is not correct");
+        }
+
+        if (isPasswordEmpty || isEmailEmpty || !isEmailCorrect) {
+            model.addAttribute("username", user.getUsername());
+            model.addAttribute("user", user);
+            return "profile";
+        }
+
         userService.updateProfile(user, password, email);
+        //TODO doesn`t work with rememberme
         SecurityContextHolder.clearContext();
-        model.addAttribute("message", "Вы успешно изменили данные, залогиньтесь снова");
-        return "login";
+        return "redirect:/login";
     }
 }

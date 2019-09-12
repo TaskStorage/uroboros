@@ -48,7 +48,7 @@
                             //this.files[0].size gets the size of your file.
                             if (this.files[0].size > 10485760)
                             {
-                                alert('Размер файла ' + this.files[0].size + ' байт превышает допустимый (10Мб)');
+                                alert('Current file size ' + this.files[0].size + ' is larger than 10Mb');
                                 myFile.value = null;
                             }
                         }
