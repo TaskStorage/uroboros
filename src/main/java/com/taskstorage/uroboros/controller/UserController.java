@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
@@ -26,6 +27,8 @@ import java.util.stream.Collectors;
 public class UserController {
     @Autowired
     private UserService userService;
+    @Autowired
+    private PersistentTokenRepository tokenRepository;
 
     @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping("/users")
@@ -140,8 +143,8 @@ public class UserController {
         }
 
         userService.updateProfile(user, password, email);
-        //TODO doesn`t work with rememberme
         SecurityContextHolder.clearContext();
+        tokenRepository.removeUserTokens(user.getUsername());
         return "redirect:/login";
     }
 }
