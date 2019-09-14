@@ -27,7 +27,7 @@ public class DbConfig {
         public LocalSessionFactoryBean sessionFactory() {
                 LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
                 sessionFactory.setDataSource(dataSource());
-                sessionFactory.setPackagesToScan(new String[] { "com.taskstorage.uroboros.model"});
+                sessionFactory.setPackagesToScan("com.taskstorage.uroboros.model");
                 sessionFactory.setHibernateProperties(hibernateProperties());
                 return sessionFactory;
         }

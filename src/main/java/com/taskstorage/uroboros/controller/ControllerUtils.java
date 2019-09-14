@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
-public class ControllerUtils {
+class ControllerUtils {
     static Map<String, String> getErrors(BindingResult bindingResult) {
         //В качестве ключа - имя поля с ошибкой с приставкой "Error"
         //В качестве значения getDefaultMessage

@@ -22,7 +22,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     @Cacheable(value = "users")
     public List<User> selectAll() {
-        List<User> users = null;
+        List<User> users;
         session = sessionFactory.openSession();
         session.beginTransaction();
         users = session.createQuery("from User").list();
@@ -33,7 +33,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     @Cacheable(value = "users")
     public User selectById(Long id) {
-        User user = null;
+        User user;
         session = sessionFactory.openSession();
         session.beginTransaction();
         // Select with query
@@ -52,7 +52,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     @Cacheable(value = "users")
     public User selectByUsername(String username) {
-        User user = null;
+        User user;
         session = sessionFactory.openSession();
         session.beginTransaction();
         String queryString = "from User where username = :username";
@@ -65,7 +65,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User findByActivationCode(String code) {
-        User user = null;
+        User user;
         session = sessionFactory.openSession();
         session.beginTransaction();
         String queryString = "from User where activationCode = :code";

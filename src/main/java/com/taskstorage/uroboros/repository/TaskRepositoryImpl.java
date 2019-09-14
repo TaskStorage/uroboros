@@ -23,7 +23,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     @Cacheable(value = "tasks")
     public List<Task> selectAll() {
-        List<Task> tasks = null;
+        List<Task> tasks;
         session = sessionFactory.openSession();
         session.beginTransaction();
         tasks = session.createQuery("from Task").list();
@@ -34,7 +34,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     @Cacheable(value = "tasks")
     public List<Task> selectByUser(User user) {
-        List<Task> tasks = null;
+        List<Task> tasks;
         session = sessionFactory.openSession();
         session.beginTransaction();
 
@@ -50,7 +50,7 @@ public class TaskRepositoryImpl implements TaskRepository {
     @Override
     @Cacheable(value = "tasks",key = "#id")
     public Task selectById(Long id) {
-        Task task = null;
+        Task task;
         session = sessionFactory.openSession();
         session.beginTransaction();
         // Select with query
@@ -103,7 +103,7 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public List<Task> findByDescriptionContainingOrContentContaining(String searchTag) {
-        List<Task> tasks = null;
+        List<Task> tasks;
         session = sessionFactory.openSession();
         session.beginTransaction();
 
@@ -118,7 +118,7 @@ public class TaskRepositoryImpl implements TaskRepository {
 
     @Override
     public List<Task> findByDescriptionContainingAndAuthorOrContentContainingAndAuthor(String searchTag, User user) {
-        List<Task> tasks = null;
+        List<Task> tasks;
         session = sessionFactory.openSession();
         session.beginTransaction();
 

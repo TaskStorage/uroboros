@@ -80,7 +80,7 @@ public class ManageController {
             // Вытягиваем все объекты из репозитория и кладём в модель
             List<User> users = userService.selectAll();
             model.addAttribute("users", users);
-            List<Task> tasks = tasks = taskRepository.selectAll();
+            List<Task> tasks = taskRepository.selectAll();
             model.addAttribute("tasks", tasks);
             //Возвращаем модель
             return "manageTasks";
@@ -122,7 +122,8 @@ public class ManageController {
             String fileToDelete = parentTask.getFilename();
             if (fileToDelete != null){
                 File file = new File(uploadPath + "/" + fileToDelete);
-                file.delete();}
+                file.delete();
+            }
         }
     }
 
